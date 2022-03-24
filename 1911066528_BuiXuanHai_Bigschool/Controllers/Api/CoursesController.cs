@@ -20,10 +20,11 @@ namespace _1911066528_BuiXuanHai_Bigschool.Controllers.Api
         {
             var userId = User.Identity.GetUserId();
             var course = _dbContext.Courses.Single(c => c.Id == id && c.LecturerId == userId);
-            if (course.IsCanceled)
-                return NotFound();
-            course.IsCanceled = true;
-            _dbContext.SaveChanges();
+            if (course.IsCanceled == false)
+            {
+                course.IsCanceled = true;
+                _dbContext.SaveChanges();
+            }
             return Ok();
         }
     }

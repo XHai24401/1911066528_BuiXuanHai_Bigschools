@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Data.Entity;
+using Microsoft.AspNet.Identity;
 using _1911066528_BuiXuanHai_Bigschool.ViewModels;
 
 namespace _1911066528_BuiXuanHai_Bigschool.Controllers
@@ -12,31 +13,37 @@ namespace _1911066528_BuiXuanHai_Bigschool.Controllers
     public class HomeController : Controller
     {
         private ApplicationDbContext _dbContext;
-        public HomeController() { _dbContext = new ApplicationDbContext(); }
+
+        public HomeController()
+        {
+            _dbContext = new ApplicationDbContext();
+        }
 
         public ActionResult Index()
         {
-            var upcommingCourses = _dbContext.Courses
-            .Include(c => c.Lecturer)
-            .Include(c => c.Category)
-            .Where(c => c.DateTime > DateTime.Now);
-
-            var viewModel = new CoursesViewModel
+            var userId = User.Identity.GetUserId();
+            var upcomingCourses = _dbContext.Courses
+                .Include(c => c.Lecturer)
+                .Include(c => c.Category)
+                .Where(c => c.DateTime > DateTime.Now && c.IsCanceled == false).ToList();
+            var isFollowCourses = _dbContext.Attendances
+                .Where(a => a.AttendeeId == userId)
+                .Include(c => c.Course);
+            var isFollowLecturers = _dbContext.Followings
+                .Where(a => a.FollowerId == userId)
+                .Include(c => c.Followee);
+            var viewModel = new CoursesViewModel()
             {
-                UpcommingCourses = upcommingCourses,
-                ShowAction = User.Identity.IsAuthenticated
-            };
+                UpcommingCourses = upcomingCourses,
+                ShowAction = User.Identity.IsAuthenticated,
+                IsFollowCourses = isFollowCourses,
+                IsFollowLecturers = isFollowLecturers,
 
+            };
             return View(viewModel);
         }
 
         public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
-        }
-        public ActionResult About1()
         {
             ViewBag.Message = "Your application description page.";
 
@@ -49,6 +56,6 @@ namespace _1911066528_BuiXuanHai_Bigschool.Controllers
 
             return View();
         }
-        
+
     }
 }
