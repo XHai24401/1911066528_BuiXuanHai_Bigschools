@@ -36,6 +36,12 @@ namespace _1911066528_BuiXuanHai_Bigschool.Controllers
 
             return View();
         }
+        public ActionResult About1()
+        {
+            ViewBag.Message = "Your application description page.";
+
+            return View();
+        }
 
         public ActionResult Contact()
         {
@@ -43,5 +49,6 @@ namespace _1911066528_BuiXuanHai_Bigschool.Controllers
 
             return View();
         }
+        
     }
 }
