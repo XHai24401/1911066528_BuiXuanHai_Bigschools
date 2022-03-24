@@ -11,5 +11,8 @@ namespace _1911066528_BuiXuanHai_Bigschool.ViewModels
         public IEnumerable<Course> UpcommingCourses { get; set; }
 
         public bool ShowAction { get; set; }
+
+        public IEnumerable<Attendance> IsFollowCourses { get; set; }
+        public IEnumerable<Following> IsFollowLecturers { get; set; }
     }
 }

@@ -14,12 +14,12 @@ namespace _1911066528_BuiXuanHai_Bigschool.Controllers
     {
 
         private readonly ApplicationDbContext _dbContext;
+
         public CoursesController()
         {
             _dbContext = new ApplicationDbContext();
         }
         // GET: Courses
-
         [Authorize]
         public ActionResult Create()
         {
@@ -30,6 +30,7 @@ namespace _1911066528_BuiXuanHai_Bigschool.Controllers
             };
             return View(viewModel);
         }
+
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -51,6 +52,7 @@ namespace _1911066528_BuiXuanHai_Bigschool.Controllers
             _dbContext.SaveChanges();
             return RedirectToAction("Index", "Home");
         }
+
         [Authorize]
         public ActionResult Attending()
         {
@@ -61,12 +63,22 @@ namespace _1911066528_BuiXuanHai_Bigschool.Controllers
                 .Include(l => l.Lecturer)
                 .Include(l => l.Category)
                 .ToList();
+            var isFollowCourses = _dbContext.Attendances
+                .Where(a => a.AttendeeId == userId)
+                .Include(c => c.Course);
+            var isFollowLecturers = _dbContext.Followings
+                .Where(a => a.FollowerId == userId)
+                .Include(c => c.Followee);
             var viewModel = new CoursesViewModel
             {
                 UpcommingCourses = courses,
-                ShowAction = User.Identity.IsAuthenticated
+                ShowAction = User.Identity.IsAuthenticated,
+                IsFollowCourses = isFollowCourses,
+                IsFollowLecturers = isFollowLecturers,
             };
             return View(viewModel);
+
+
         }
 
         [Authorize]
@@ -78,7 +90,6 @@ namespace _1911066528_BuiXuanHai_Bigschool.Controllers
                 .Include(l => l.Lecturer)
                 .Include(c => c.Category)
                 .ToList();
-
             return View(courses);
         }
 
@@ -90,17 +101,17 @@ namespace _1911066528_BuiXuanHai_Bigschool.Controllers
             var viewModel = new CourseViewModel
             {
                 Categories = _dbContext.Categories.ToList(),
-                Date = course.DateTime.ToString("dd/M/yyyy"),
+                Date = course.DateTime.ToString("dd/MM/yyyy"),
                 Time = course.DateTime.ToString("HH:mm"),
                 Category = course.CategoryId,
                 Place = course.Place,
                 Heading = "Edit Course",
                 Id = course.Id
+
             };
             return View("Create", viewModel);
-
-
         }
+
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
